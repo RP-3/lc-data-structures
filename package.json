@@ -6,7 +6,7 @@
   "scripts": {
     "build": "./node_modules/.bin/tsc",
     "watch": "./node_modules/.bin/tsc -w",
-    "test": "npx mocha build/**/*.test.js",
+    "test": "npx mocha --require source-map-support/register build/**/*.test.js",
     "coverage": "npx nyc mocha build/**/*.test.js"
   },
   "author": "RP-3",
@@ -22,6 +22,7 @@
     "chai": "^4.2.0",
     "mocha": "^7.2.0",
     "nyc": "^15.0.1",
+    "source-map-support": "^0.5.19",
     "tslint": "^5.14.0"
   }
 }
