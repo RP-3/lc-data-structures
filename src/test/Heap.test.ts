@@ -8,16 +8,16 @@ describe('Heap', function(){
 
     type TestObject = {key: string, val: number};
 
-    function assertHeapOrdering(heap: Heap<TestObject>, comparator: (a: TestObject, b: TestObject) => number){
+    function assertHeapOrdering<T>(heap: Heap<T>){
         for(let i=0; i<heap.storage.length; i++){
             const parent = heap.storage[i];
             const leftChildIndex = i*2+1;
             const rightChildIndex = i*2+2;
             if(leftChildIndex < heap.storage.length){
-                expect(comparator(parent, heap.storage[leftChildIndex])).to.be.lessThan(1);
+                expect(heap.comparator(parent, heap.storage[leftChildIndex])).to.be.lessThan(1);
             }
             if(rightChildIndex < heap.storage.length){
-                expect(comparator(parent, heap.storage[rightChildIndex])).to.be.lessThan(1);
+                expect(heap.comparator(parent, heap.storage[rightChildIndex])).to.be.lessThan(1);
             }
         }
     }
@@ -109,7 +109,7 @@ describe('Heap', function(){
                 });
 
                 it('should not violate the heap ordering property', function(){
-                    assertHeapOrdering(subject, comparator);
+                    assertHeapOrdering(subject);
                 });
             });
 
@@ -126,7 +126,7 @@ describe('Heap', function(){
                 });
 
                 it('should not violate the heap ordering property', function(){
-                    assertHeapOrdering(subject, comparator);
+                    assertHeapOrdering(subject);
                 });
             });
         });
@@ -179,7 +179,7 @@ describe('Heap', function(){
                 it('sorts items by predicate order', function(){
                     let lastValue = Infinity;
                     while(subject.size()){
-                        assertHeapOrdering(subject, comparator);
+                        assertHeapOrdering(subject);
                         const top = subject.pop()!;
                         expect(top.val).to.be.lessThan(lastValue);
                         lastValue = top?.val;
@@ -240,7 +240,7 @@ describe('Heap', function(){
                 it('ejects the highest priority item', function(){
                     const sortedContents = [];
                     while(subject.size()){
-                        assertHeapOrdering(subject, comparator);
+                        assertHeapOrdering(subject);
                         sortedContents.push(subject.pop()!);
                     }
                     expect(sortedContents).to.deep.eq([
@@ -252,6 +252,60 @@ describe('Heap', function(){
                     ]);
                 });
             });
+        });
+    });
+
+    describe('robustness', function(){
+
+        const comparator = (a: number, b: number) => b - a; // max-value items at head
+        const heapSize = Infinity;
+        const testSize = 200;
+        const popPercent = 0.25;
+
+        let subject: Heap<number>;
+        this.beforeEach(function(){
+            subject = new Heap(comparator, heapSize);
+        });
+
+        describe('heap ordering', function(){
+
+            it('never violates the heap ordering property', function(){
+
+                for(let i=0; i<testSize; i++){
+                    const add = Math.random() > popPercent;
+                    if(add){
+                        const val = Math.floor(Math.random()*1000);
+                        subject.push(val);
+                    }else{
+                        subject.pop();
+                    }
+                    assertHeapOrdering(subject);
+                }
+            });
+        });
+    });
+
+    describe('heapify', function(){
+
+        const comparator = (a: number, b: number) => b - a; // max-value items at head
+
+        let subject: Heap<number>;
+        this.beforeEach(function(){
+            const nums = [1, 9, 2, 8, 3, 7, 4, 6, 5, 4, 6, 3, 7, 2, 8, 1, 9];
+            subject = Heap.heapify(nums, comparator);
+        });
+
+        it('generates a valid heap out of the given array', function(){
+            assertHeapOrdering(subject);
+        });
+
+        it('pops its contents in sorted order', function(){
+            let lastItem = Infinity;
+            while(subject.size()){
+                const next = subject.pop()!;
+                expect(lastItem).to.be.greaterThan(next-1);
+                lastItem = next;
+            }
         });
     });
 });

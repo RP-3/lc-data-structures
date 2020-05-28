@@ -6,14 +6,21 @@
  */
 export class Heap<T> {
 
-    public readonly storage: T[] = [];
+    public storage: T[] = [];
 
     constructor(
-        private readonly comparator: (a: T, b: T) => number,
-        private readonly maxSize=Infinity
+        public readonly comparator: (a: T, b: T) => number,
+        public readonly maxSize=Infinity
     ){}
 
     // MARK: Public interface
+    static heapify<G>(array: G[], comparator: (a: G, b: G) => number, maxSize=Infinity){
+        const result = new Heap<G>(comparator, maxSize);
+        result.storage = array;
+        result.heapify();
+        return result;
+    }
+
     /**
      * Add an item to the heap.
      * If the heap is at its maximum capacity the highest priority item (as determined
@@ -97,5 +104,11 @@ export class Heap<T> {
 
     private rightChildIndex(parentIndex: number){
         return parentIndex * 2 + 2;
+    }
+
+    private heapify(){
+        if(!this.storage.length) return;
+        let parentIndex = Math.floor((this.storage.length-1-1)/2);
+        while(parentIndex >= 0) this.percolateDown(parentIndex--);
     }
 }
