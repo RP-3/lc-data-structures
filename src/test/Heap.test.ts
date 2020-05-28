@@ -288,24 +288,40 @@ describe('Heap', function(){
     describe('heapify', function(){
 
         const comparator = (a: number, b: number) => b - a; // max-value items at head
-
         let subject: Heap<number>;
-        this.beforeEach(function(){
-            const nums = [1, 9, 2, 8, 3, 7, 4, 6, 5, 4, 6, 3, 7, 2, 8, 1, 9];
-            subject = Heap.heapify(nums, comparator);
+
+        context('when the provided array is empty', function(){
+
+            this.beforeEach(function(){
+                const nums: number[] = [];
+                subject = Heap.heapify(nums, comparator);
+            });
+
+            it('generates a valid (albeit empty) heap out of the given array', function(){
+                assertHeapOrdering(subject);
+                expect(subject.storage.length).to.eq(0);
+            });
         });
 
-        it('generates a valid heap out of the given array', function(){
-            assertHeapOrdering(subject);
-        });
+        context('when the provided array has items in it', function(){
 
-        it('pops its contents in sorted order', function(){
-            let lastItem = Infinity;
-            while(subject.size()){
-                const next = subject.pop()!;
-                expect(lastItem).to.be.greaterThan(next-1);
-                lastItem = next;
-            }
+            this.beforeEach(function(){
+                const nums = [1, 9, 2, 8, 3, 7, 4, 6, 5, 4, 6, 3, 7, 2, 8, 1, 9];
+                subject = Heap.heapify(nums, comparator);
+            });
+
+            it('generates a valid heap out of the given array', function(){
+                assertHeapOrdering(subject);
+            });
+
+            it('pops its contents in sorted order', function(){
+                let lastItem = Infinity;
+                while(subject.size()){
+                    const next = subject.pop()!;
+                    expect(lastItem).to.be.greaterThan(next-1);
+                    lastItem = next;
+                }
+            });
         });
     });
 });
