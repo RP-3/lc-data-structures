@@ -1,0 +1,13 @@
+{
+    "rules": {
+        "max-line-length": {
+            "options": [140]
+        },
+        "new-parens": true,
+        "no-trailing-whitespace": true,
+        "no-unsafe-any": true,
+        "no-unused-variable": true,
+        "no-unused-expression": true,
+        "semicolon": true
+    }
+}
